@@ -1,20 +1,11 @@
 package entity;
 
 public class Result {
+
     private boolean flag;
     private Integer code;
     private String message;
     private Object data;
-
-    @Override
-    public String toString() {
-        return "Result{" +
-                "flag=" + flag +
-                ", code=" + code +
-                ", message='" + message + '\'' +
-                ", data=" + data +
-                '}';
-    }
 
     public boolean isFlag() {
         return flag;
@@ -49,9 +40,19 @@ public class Result {
     }
 
     public Result(boolean flag, Integer code, String message, Object data) {
+        super();
         this.flag = flag;
         this.code = code;
         this.message = message;
         this.data = data;
+    }
+    public Result(){
+
+    }
+    public Result(boolean flag, Integer code, String message) {
+        super();
+        this.flag = flag;
+        this.code = code;
+        this.message = message;
     }
 }
