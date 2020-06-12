@@ -4,6 +4,8 @@ import com.tensquare.base.dao.LabelDao;
 import com.tensquare.base.pojo.Label;
 import entity.IdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -71,29 +73,56 @@ public class LabelService {
     }
 
     /**
-     * 查询条件
+     * 构建查询条件
      * @param searchMap
      * @return
      */
-    public List<Label> findSearch(Map searchMap) {
-        return labelDao.findAll(new Specification<Label>() {
+    private Specification<Label> createSpecification(Map searchMap) {
+        return new Specification<Label>() {
             @Override
             public Predicate toPredicate(Root<Label> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
                 List<Predicate> predicateList = new ArrayList<>();
                 //标签名称查询
-                if(searchMap.get("labelname")!=null && !"".equals(searchMap.get("labelname"))){
-                    predicateList.add(cb.like(root.get("labelname").as(String.class),"%"+(String)searchMap.get("labelname")+"%"));
-                };
+                if (searchMap.get("labelname") != null && !"".equals(searchMap.get("labelname"))) {
+                    predicateList.add(cb.like(root.get("labelname").as(String.class), "%" + (String) searchMap.get("labelname") + "%"));
+                }
+                ;
                 //状态查询
-                if(searchMap.get("state")!=null && !"".equals(searchMap.get("state"))){
-                    predicateList.add(cb.equal(root.get("state").as(String.class),(String)searchMap.get("state")));
-                };
+                if (searchMap.get("state") != null && !"".equals(searchMap.get("state"))) {
+                    predicateList.add(cb.equal(root.get("state").as(String.class), (String) searchMap.get("state")));
+                }
+                ;
                 //状态查询
-                if(searchMap.get("recommend")!=null && !"".equals(searchMap.get("recommend"))){
-                    predicateList.add(cb.equal(root.get("recommend").as(String.class),(String)searchMap.get("recommend")));
-                };
+                if (searchMap.get("recommend") != null && !"".equals(searchMap.get("recommend"))) {
+                    predicateList.add(cb.equal(root.get("recommend").as(String.class), (String) searchMap.get("recommend")));
+                }
+                ;
                 return cb.and(predicateList.toArray(new Predicate[predicateList.size()]));
             }
-        });
+        };
+    }
+
+    /**
+     * 查询条件
+     *
+     * @param searchMap
+     * @return
+     */
+    public List<Label> findSearch(Map searchMap) {
+        Specification<Label> specification = createSpecification(searchMap);
+        return labelDao.findAll(specification);
+    }
+
+    /**
+     * 分页条件查询
+     * @param searchMap
+     * @param page
+     * @param size
+     * @return
+     */
+    public Page<Label> findSearch(Map searchMap, int page, int size) {
+        Specification<Label> specification = createSpecification(searchMap);
+        PageRequest pageRequest = PageRequest.of(page - 1, size);
+        return labelDao.findAll(specification,pageRequest);
     }
 }
